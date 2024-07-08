@@ -49,9 +49,32 @@ sudo apt-get install ros-noetic-realsense2-camera
 
 Next, install the unofficial [ROS Robotiq package](https://github.com/cambel/robotiq) from the Control Robotics Intelligence Group from the Nanyang Technological University, Singapore by following the described steps. The package is used for visualization but not for connecting to the Hand-E.
 
-Next, make sure that the ur_master_thesis package is inside your `~/catkin_ws/src` workspace together with all the ROS packages that just were installed. 
+Next, make sure that the `ur_master_thesis` package is inside your `~/catkin_ws/src` workspace together with all the ROS packages that just were installed. 
 
+Install any missing dependencies using rosdep:
+```console
+rosdep update
+rosdep install --from-paths . --ignore-src -y
+```
 
+Then compile your ROS workspace (I choose to use):
+```console
+cd ~/catkin_ws && catkin_make
+```
 
+Open a console and start the ROS Master:
+```console
+roscore
+```
+if not already set as default do not forget to source the correct workspace:
+```console
+source ~/catkin_ws/devel/setup.bash
+```
+
+Please note that you have to exchange the calibration file `ur5e_umh_calibration.yaml` since it depends on the hardware you are using by running 
+```console
+roslaunch ur_calibration calibration_correction.launch \
+  robot_ip:=<robot_ip> target_filename:="${HOME}/my_robot_calibration.yaml"
+```
 ## Results
 
