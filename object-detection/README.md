@@ -15,6 +15,9 @@ python -m venv object-detection-venv
 ```python
 source object-detection-venv/bin/activate
 ```
+```python
+pip install -r requirements.txt
+```
 
 To train the YOLO model either execute `train_yolo_segm.py` locally if you have a good GPU available. For this thesis the DTU HPC cluster is used. The execution scipt can be found in `train.sh`.
 
