@@ -43,6 +43,8 @@ Results demonstrate a robust detection model capable of adapting to varying labo
 The project delivers an easy extendable setup based on the Robot Operating System (ROS) that is tested under real-world conditions, successfully replicating researcher tasks with an overall success rate of 87%. This proof-of-concept highlights the potential of combining computer vision and robotic manipulation in laboratory settings, facilitating future enhancements such as integrating a mobile base for automating routine tasks.
 
 ## Overview of the Project
+An overview of the compnents and subsystems is summarized in the following Figure:
+<img src="https://github.com/hmhauter/lab-perception-and-maipulation/figures/SystemOverview.PNG" width="700">
 
 ## License
 
