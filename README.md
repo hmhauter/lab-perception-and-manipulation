@@ -29,8 +29,8 @@ git clone https://github.com/hmhauter/lab-perception-and-maipulation
 
 ## Subprojects
 
-- [Object Detection](https://github.com/hmhauter/lab-perception-and-maipulation)
-- [Pick-and-Place](https://github.com/hmhauter/lab-perception-and-maipulation)
+- [Object Detection](https://github.com/hmhauter/lab-perception-and-maipulation/tree/master/object-detection)
+- [Pick-and-Place](https://github.com/hmhauter/lab-perception-and-maipulation/tree/master/pick-and-place)
 
 ## Background
 To further advance laboratory automation, a bridge is required to connect the unordered human workspace with the structured world of automation equipment.
@@ -44,7 +44,7 @@ The project delivers an easy extendable setup based on the Robot Operating Syste
 
 ## Overview of the Project
 An overview of the compnents and subsystems is summarized in the following Figure:
-<img src="https://github.com/hmhauter/lab-perception-and-maipulation/figures/SystemOverview.PNG" width="700">
+<img src="https://github.com/hmhauter/lab-perception-and-maipulation/blob/master/figures/SystemOverview.PNG" width="700">
 
 ## License
 
