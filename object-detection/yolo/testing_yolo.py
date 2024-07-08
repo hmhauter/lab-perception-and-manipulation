@@ -1,19 +1,17 @@
 import cv2
 import numpy as np
-import pyrealsense2 as rs
 from ultralytics import YOLO
 from matplotlib import pyplot as plt
-import copy 
-import torch
 import cv2
 import numpy as np
-from sklearn.metrics import jaccard_score
 from pathlib import Path
 from tqdm import tqdm
 from matplotlib.patches import Polygon
 
+# This script tests the YOLO model on the real-world dataset test
+
 def load_images_and_labels():
-    test_dir = "./dataset_segm/valid/"
+    test_dir = "object-detection/dataset-segm/test"
     image_dir = Path(test_dir) / "images"
     label_dir = Path(test_dir) / "labels"
 
@@ -142,7 +140,7 @@ def calculate_iou(mask1, mask2):
 
 def evaluate_model(images, labels, device='cuda'):
     # MODEL 
-    plate_model_segm = YOLO("./runs/segment/train/weights/best.pt")
+    plate_model_segm = YOLO("object-detection/model/best.pt")
 
 
     all_jaccard_scores = []

@@ -2,6 +2,8 @@ import os
 import numpy as np
 from PIL import Image
 
+# This script brings the synthetically generated data into YOLO format (labels and images)
+
 # Directories containing the images and corresponding data
 directories_img = [
     './RenderProduct_Replicator/rgb',
@@ -13,7 +15,7 @@ directories_data = [
     './RenderProduct_Replicator_01/bounding_box_2d_tight',
     './RenderProduct_Replicator_02/bounding_box_2d_tight'
 ]
-output_dir = './dataset_syn/train/'
+output_dir = 'object-detection/dataset-segm/train'
 
 # Create output directories for images and labels if they don't exist
 os.makedirs(os.path.join(output_dir, 'images'), exist_ok=True)

@@ -20,7 +20,7 @@ The Thesis explores the opportunities for systems that use computer vision and r
 
 ## Installation
 
-Please refer to the specific folders of the project for installation details for the specific usage.
+Please refer to the specific folders of the project for installation details for the specific usage. In general it is assumed you are on a Linux system. The code is tested for Ubuntu 20.04 LTS. 
 
 ```python
 git clone https://github.com/hmhauter/lab-perception-and-maipulation
