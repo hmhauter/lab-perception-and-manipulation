@@ -21,10 +21,10 @@ To train the YOLO model either execute `train_yolo_segm.py` locally if you have 
 ## Results
 After training, the numerous confusion matrix for the YOLO model is:
 
-<img src="https://github.com/hmhauter/lab-perception-and-maipulation/blob/master/figures/confusion_matrix.png" width="700">
+<img src="https://github.com/hmhauter/lab-perception-and-maipulation/blob/object_detection/figures/confusion_matrix.png" width="700">
 The evaluation was done on the real-life dataset with an IoU threshold of 70% and a confidence threshold of 70%. This means that predictions with an IoU less than 70% or a confidence less than 70% are considered False Negatives. 
 The overall precision is 98.02%, and the recall 92.5%. The overall accuracy of the detection model is 90.82%.
 
 Exaples of predictions are given like:
 
-<img src="https://github.com/hmhauter/lab-perception-and-maipulation/blob/master/figures/GoodScore.png" width="700">
+<img src="https://github.com/hmhauter/lab-perception-and-maipulation/blob/object_detection/figures/GoodScore.png" width="700">
