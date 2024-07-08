@@ -1,0 +1,1 @@
+Place the trained YOLO model here. Please contact the creator of this repository to get access to the model.
