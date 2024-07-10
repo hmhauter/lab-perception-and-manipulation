@@ -11,6 +11,7 @@ import tf2_ros
 import time
 from matplotlib import pyplot as plt
 from position_controller import PositionControllerUR
+from moxa import MoxaRelay
 import utils
 import transforms3d.quaternions as quat
 import robotiq_gripper
@@ -48,8 +49,8 @@ class AutomationPipeline():
 
         self.camera_intrinsics = {}
 
-        self.SEARCH_MIN_BASE = -50
-        self.SEARCH_MAX_BASE = 30
+        self.SEARCH_MIN_BASE = -180
+        self.SEARCH_MAX_BASE = 180
 
         self.SEARCH_MIN_WRIST = -20
         self.SEARCH_MAX_WRIST = 20
@@ -117,6 +118,7 @@ class AutomationPipeline():
         self.center_point_pub = rospy.Publisher('/plate/center', PlateROI, queue_size=10)
 
         self.ocrROI = OCR_ROI()
+        self.moxa = MoxaRelay()
 
     def write_to_csv(self, filename, data):
         # Open the CSV file in append mode
@@ -252,7 +254,7 @@ class AutomationPipeline():
         """
 
         start_angle = 0
-        end_angle = 35
+        end_angle = 25
         angle_step = 5
         points = []
         rotated_quats = []
@@ -292,7 +294,8 @@ class AutomationPipeline():
         while angle <= end_angle_rad:
             angle += angle_step_rad
  
-            point = np.array(center_point) - radius * np.sin(angle) * y_axis + radius * np.cos(angle) * z_axis
+            point = np.array(center_point) - 2*radius * np.sin(angle) * y_axis + radius * np.cos(angle) * z_axis
+    
             point[2] -= counter * 0.01
 
             points.append(tuple(point))   
@@ -314,7 +317,7 @@ class AutomationPipeline():
                 point_x[2] -= index * 0.02
                 points.append(tuple(point_x))
                 r_x = Rotation.from_quat(quat_rotated)
-                r_rotated_x = r_x * Rotation.from_rotvec([0, -alpha, 0])
+                r_rotated_x = r_x * Rotation.from_rotvec([0, alpha, 0]) # or - alpha?
                 quat_rotated_x = r_rotated_x.as_quat()
                 rotated_quats.append(quat_rotated_x)
 
@@ -599,8 +602,8 @@ class AutomationPipeline():
                 
                 box_angle, box_unit_vector = self.ocrROI.getAngle(segmented_image)
                 box_vector_base = utils.angle_camera_base(box_unit_vector, ee_pose)
-                
-                eigenvectors, mean, gl_1, gl_2, gw_1, gw_2 = self.grasp_point_estimator.estimate_grasp_point(segmented_image, segmented_depth, self.camera_intrinsics)
+
+                eigenvectors, mean, gl_1, gl_2, gw_1, gw_2, point_cloud, line_set, pcl, mesh_coordinate_frame, registered_pointcloud, fitness, pcl_surface, pcl_surface_smooth= self.grasp_point_estimator.estimate_grasp_point(segmented_image, segmented_depth, self.camera_intrinsics)
 
 
                 debug_array.append(str(mean[0]))
@@ -665,8 +668,9 @@ class AutomationPipeline():
                 # for j in range(len(radius_list)):
                 point_base = copy.deepcopy(point_base_copy)
                 # radius = radius_list[j]
+                self.moxa.setLightOn()
 
-                radius = 0.2
+                radius = 0.15
                 point_base[2] += 0.15
                 points, rotated_quats = self.generate_points(quaternion, point_base, R_tcp[:, 1], normal_z, radius)
                 
@@ -752,19 +756,19 @@ class AutomationPipeline():
                     # print("COUNT FALSE: ", len(false_values))   # has chars
                     # self.ocr_detection = []
                     # stop_conter = time.time()
-                    # if self.OCR_DONE == True:
+                    if self.OCR_DONE == True:
                         
-                    #     # RESET all OCR values
-                    #     self.OCR_DONE = False
-                    #     self.ocr_counter = 0
-                    #     self.ocr_detection = []
-                    # # if len(false_values) > 0.5*len(true_values):
-                    #     print("############################")
-                    #     print("Detected charactersradius_list")
-                    #     print("Time: ", (stop_conter - start_counter))
-                    #     print("############################")
-                    #     self.position_controller.init_search()
-                    #     return debug_array
+                        # RESET all OCR values
+                        self.OCR_DONE = False
+                        self.ocr_counter = 0
+                        self.ocr_detection = []
+                    # if len(false_values) > 0.5*len(true_values):
+                        print("############################")
+                        print("Detected charactersradius_list")
+                        # print("Time: ", (stop_conter - start_counter))
+                        print("############################")
+                        self.position_controller.init_search()
+                        return debug_array
                     
                 c+=1
 
@@ -800,6 +804,8 @@ class AutomationPipeline():
 
     def ocr_callback(self, msg):
         try:
+            print("got OCR")
+            print(msg.data)
             if self.TRACK_OCR:
                 self.ocr_detection.append(msg.data)
                 if self.ocr_counter >= 10:

@@ -26,6 +26,7 @@
     <node name="camera_processing" pkg="ur_master_thesis" type="camera.py" output="screen"/>
     
     <!-- Main static light processing -->
-    <node name="main_static_light" pkg="ur_master_thesis" type="main_static_light.py" output="screen"/>
     <node name="detect_chars_static" pkg="ur_master_thesis" type="detect_chars_static.py" output="screen"/>
+    <node name="detect_chars_static_2" pkg="ur_master_thesis" type="detect_chars_static_2.py" output="screen"/>
+    <node name="main_static_light" pkg="ur_master_thesis" type="main_static_light.py" output="screen"/>
 </launch>
