@@ -46,6 +46,13 @@ The project delivers an easy extendable setup based on the Robot Operating Syste
 An overview of the compnents and subsystems is summarized in the following Figure:
 <img src="https://github.com/hmhauter/lab-perception-and-maipulation/blob/master/figures/SystemOverview.PNG" width="700">
 
+An explanation of the system can be found in the following video:
+
+
+https://github.com/hmhauter/lab-perception-and-manipulation/assets/50957644/fd3e6498-312d-405b-a5c4-c89835e8bc77
+
+
+
 ## License
 
 This project is licensed under the terms of the MIT license. 
