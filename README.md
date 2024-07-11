@@ -36,9 +36,9 @@ git clone https://github.com/hmhauter/lab-perception-and-maipulation
 To further advance laboratory automation, a bridge is required to connect the unordered human workspace with the structured world of automation equipment.
 This work focuses on 96-well plates, commonly used in research labs, and presents a robotic system to transfer these plates, for example, from a laboratory workbench to a liquid handler. The developed system reduces the time and effort needed by researchers by automating the pick-and-place tasks of 96-well plates.
 
-This study explores the integration of computer vision and robot manipulation in research laboratories using accessible hardware. The robot observes its environment with a camera, detecting plates using a YOLO model trained on synthetic data. The depth and segmented images are combined to accurately estimate the plate's pose with point cloud registration for precise grasping by the parallel gripper. Optical character recognition (OCR) is employed to determine the correct plate orientation by identifying the $A$-1 well, addressing challenges of visibility on transparent and translucent plates with embossed, engraved, and printed characters. The robot then places the plates on automation equipment, such as liquid handlers, without spilling any liquid. 
+This study explores the integration of computer vision and robot manipulation in research laboratories using accessible hardware. The robot observes its environment with a camera, detecting plates using a You Only Look Once (YOLO) model trained on mainly synthetic data. The depth and segmented images are combined to accurately estimate the plate's pose with point cloud registration for precise grasping by the parallel gripper. Optical character recognition (OCR) is employed to determine the correct plate orientation by identifying the characters $A$ to $H$ marking the wells, addressing challenges of visibility on transparent and translucent plates with embossed, engraved, and printed characters. The robot then places the plates on automation equipment, such as liquid handlers, without spilling any liquid. 
 
-Results demonstrate a robust detection model capable of adapting to varying laboratory conditions. The work brings novelty to the state of the art by the high-accuracy OCR on embossed, engraved and printed characters on transparent and translucent plates, achieving a 97% success rate in correct plate rotation determination with the a simple ring light setup. Additionally, the work serves as a first investigation for future improvement in optimizing camera positions for character visibility using active vision techniques.
+Results demonstrate a robust detection model capable of adapting to varying laboratory conditions. Additionally, a pick-and-place routine specifically tailored to 96-well plates is developed with an accuracy of 92% for placing the plate in  ±2 mm. The work brings novelty to the state of the art by the high-accuracy OCR on embossed, engraved and printed characters on transparent and translucent plates, achieving a 97% success rate in correct plate rotation determination with the a simple ring light setup. Additionally, the work serves as a first investigation for future improvement in optimizing camera positions for character visibility using active vision techniques.
 
 The project delivers an easy extendable setup based on the Robot Operating System (ROS) that is tested under real-world conditions, successfully replicating researcher tasks with an overall success rate of 87%. This proof-of-concept highlights the potential of combining computer vision and robotic manipulation in laboratory settings, facilitating future enhancements such as integrating a mobile base for automating routine tasks.
 
@@ -48,8 +48,8 @@ An overview of the compnents and subsystems is summarized in the following Figur
 
 An explanation of the system can be found in the following video:
 
+https://github.com/hmhauter/lab-perception-and-manipulation/assets/50957644/7de6d817-3f17-4483-b418-434fedf4e269
 
-https://github.com/hmhauter/lab-perception-and-manipulation/assets/50957644/fd3e6498-312d-405b-a5c4-c89835e8bc77
 
 
 
