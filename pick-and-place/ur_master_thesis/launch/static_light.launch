@@ -1,0 +1,32 @@
+<launch>
+    <!-- Source the setup.bash file -->
+    <env name="BASH_ENV" value="~/catkin_ws/devel/setup.bash"/>
+
+    <!-- Launch UR robot driver -->
+    <include file="$(find ur_robot_driver)/launch/ur5e_bringup.launch">
+        <arg name="robot_ip" value="192.168.1.100"/>
+        <arg name="kinematics_config" value="~/catkin_ws/src/ur5e_uhmh_calibration.yaml"/>
+    </include>
+
+    <!-- Launch MoveIt planning execution -->
+    <include file="$(find ur5e_moveit_config)/launch/moveit_planning_execution.launch"/>
+
+    <!-- Launch MoveIt RViz -->
+    <include file="$(find ur5e_moveit_config)/launch/moveit_rviz.launch">
+        <arg name="rviz_config" value="$(find ur5e_moveit_config)/launch/moveit.rviz"/>
+        <arg name="use_sim_time" value="true"/>
+    </include>
+
+    <!-- Launch RealSense camera -->
+    <include file="$(find realsense2_camera)/launch/rs_aligned_depth.launch"/>
+
+    <!-- Custom nodes -->
+    <node name="camera_robot_transform" pkg="ur_master_thesis" type="camera_robot_transform.py" output="screen"/>
+    <node name="aruco_detection" pkg="ur_master_thesis" type="aruco_24.py" output="screen"/>
+    <node name="camera_processing" pkg="ur_master_thesis" type="camera.py" output="screen"/>
+    
+    <!-- Main static light processing -->
+    <node name="detect_chars_static" pkg="ur_master_thesis" type="detect_chars_static.py" output="screen"/>
+    <node name="detect_chars_static_2" pkg="ur_master_thesis" type="detect_chars_static_2.py" output="screen"/>
+    <node name="main_static_light" pkg="ur_master_thesis" type="main_static_light.py" output="screen"/>
+</launch>
