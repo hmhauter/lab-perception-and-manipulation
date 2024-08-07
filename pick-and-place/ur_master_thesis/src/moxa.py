@@ -3,6 +3,9 @@ from time import sleep
 import requests
 import logging
 
+"""
+Controller for the MOXA: Connection for FESTO Ring Light
+"""
 
 class MoxaRelay:
     def __init__(self) -> None:
@@ -12,7 +15,6 @@ class MoxaRelay:
 
     def getRelayInformation(self, relayNum):
         url = f'http://{self.ip}/api/slot/0/io/relay/{relayNum}/relayStatus'
-        print(url)
         return self.__get(url)
 
 
@@ -38,7 +40,7 @@ class MoxaRelay:
         response = requests.get(url, headers=headers)
         if response.status_code == 200:
             logging.info("Get request sent successfully:")
-            print(response)
+    
         else:
             logging.error("Get request failed with status code:", response.status_code)
 

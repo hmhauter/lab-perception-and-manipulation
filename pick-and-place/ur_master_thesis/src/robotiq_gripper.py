@@ -1,3 +1,5 @@
+"""DISCLAIER: THIS IS NOT MINE!"""
+
 """Module to control Robotiq's grippers - tested with HAND-E"""
 
 import socket

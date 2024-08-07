@@ -27,7 +27,7 @@ class CharDetector():
         self.text_pub = rospy.Publisher('detected_text', std_msgs.msg.String, queue_size=10)
         self.angle_pub = rospy.Publisher('correction_angle', std_msgs.msg.Float32, queue_size=10)
         self.bridge = CvBridge()
-        self.plate_detector = PlateDetector("/home/apo/Documents/MasterThesis/adaptive-lab-automation/datasets/runs/segment/train/weights/best.pt")
+        self.plate_detector = PlateDetector("object-detection/model/best.pt")
         rospy.Subscriber("camera/color/image_raw", Image, self.image_callback)
         rospy.Subscriber("/plate/center", PlateROI, self.point_callback)
 
@@ -67,68 +67,18 @@ class CharDetector():
     def chop_image(sellf, image):
         # Ign½ore the first 20 pixels from the top and bottom
         height, width = image.shape[:2]
-        margin = 0 # int(height*0.04)
+        margin = 0 
         cropped_image = image[margin:height-margin, :]
 
-        # Get the height of the cropped strip
         strip_height = cropped_image.shape[0]
 
-        # Calculate the height of each subimage
         subimage_height = strip_height // 8
 
-        # Cut the cropped strip into 8 equal pieces horizontally
         subimages = [cropped_image[i*subimage_height:(i+1)*subimage_height, :] for i in range(8)]
         return subimages
     
-    def perform_edge_detection(self, image):
-        # Apply adaptive histogram equalization
-        clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
-        equalized = clahe.apply(image)
 
-        # Apply Gaussian blur
-        # blurred = cv2.GaussianBlur(equalized, (5, 5), 0)
 
-        # Perform Canny edge detection
-        edges = cv2.Canny(equalized, 20, 170)
-
-        return edges
-
-    def perform_line_detection(self, edges, gray_image):
-        # Detect lines using the Hough Line Transform
-        lines = cv2.HoughLinesP(edges, rho=1, theta=np.pi/180, threshold=80, minLineLength=25, maxLineGap=4)
-        angle_with_vertical = 0.0
-        # Initialize variables to store the longest line
-        max_length = 0
-        longest_line = None
-        if lines is not None:
-            # Iterate over the detected lines to find the longest one
-            for line in lines:
-                x1, y1, x2, y2 = line[0]
-                length = np.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
-                if length > max_length:
-                    max_length = length
-                    longest_line = (x1, y1, x2, y2)
-
-            # Draw the longest line on the original image
-            if longest_line is not None:
-
-                x1, y1, x2, y2 = longest_line
-                color_image = cv2.cvtColor(gray_image, cv2.COLOR_GRAY2BGR)  # Convert grayscale to BGR for color drawing
-                cv2.line(color_image, (x1, y1), (x2, y2), (0, 0, 255), 2)  # Draw the longest line in red
-
-                # Get correction angle
-                angle_rad = np.arctan2(y2 - y1, x2 - x1)
-                angle_deg = np.degrees(angle_rad)
-                
-                # Calculate the angle with respect to the vertical axis
-                angle_with_vertical = 90 - abs(angle_deg)
-                print("angle with vertical")
-                print(angle_with_vertical)
-                # Display the result
-
-        else:
-            print("No lines were detected.")
-        return angle_with_vertical
 
 
     def write_to_csv(self, row):
@@ -141,11 +91,9 @@ class CharDetector():
     def get_roi(self):
         if self.plate_center_available:
             self.IS_EMPTY = True
-
-            cv2.imshow("RGB Image fom OCR", self.rgb_img)
-            cv2.waitKey(1)               
+            
    
-            # Convert the image to grayscale
+
             rgb_img = copy.deepcopy(self.rgb_img)
             segmented_image, segmented_depth = self.plate_detector.segment(rgb_img, np.zeros_like(rgb_img[:, :, 0]), debug=False)
 
@@ -164,27 +112,13 @@ class CharDetector():
             p_img_inner_1 = utils.transform_base_img(point_center_edge_1_inner, current_ee_pose, image_width, image_height)
             p_img_inner_2 = utils.transform_base_img(point_center_edge_2_inner, current_ee_pose, image_width, image_height)
             if p_img_edge_1 is None or p_img_edge_2 is None or p_img_inner_1 is None or p_img_inner_2 is None:
-                # self.plate_center_available = False 
+            
                 return
             try:
                 cropped_img = utils.cut_out_img(gray_image, p_img_edge_1[0:2], p_img_edge_2[0:2], p_img_inner_1[0:2], p_img_inner_2[0:2])
                 cropped_img = cv2.rotate(cropped_img, cv2.ROTATE_90_COUNTERCLOCKWISE)
         
-                # Apply unsharp masking
-                # image_sharp = self.unsharp_masking(cropped_img)
 
-                # edges = self.perform_edge_detection(image_sharp)
-    
-                # if edges is not None:
-                #     angle_vertical = self.perform_line_detection(edges, image_sharp)
-    
-                #     if angle_vertical:
-                #         send_angle = std_msgs.msg.Float32()
-                #         send_angle.data = angle_vertical
-                #         self.angle_pub.publish(send_angle)
-                # plt.figure()
-                # plt.imshow(image_sharp)
-                # plt.show() 
 
                 img_preprocessed = self.perform_image_preprocessing(cropped_img)
                 img_for_showing = copy.deepcopy(img_preprocessed)
@@ -196,19 +130,12 @@ class CharDetector():
                 has_chars = self.perform_tempplate_matching(img_preprocessed)
                 if has_chars == 1:
                     self.IS_EMPTY = False
-                    print("Chars detected on Plate !!!!!!!!!!!!!!!")
+                    rospy.loginfo("Chars detected on Plate")
 
                         
 
 
-                # else:
-                #     cv2.imwrite(f"/home/apo/catkin_ws/src/ur_master_thesis/src/dataset_debug/img_{self.counter}_{}.jpg", subimage)
-                # self.write_to_csv(str(self.IS_EMPTY))
-                # print(self.IS_EMPTY)
-    
-                # rospy.loginfo("Text found: %s", text_str)
 
-                # Publish the detected text
                 send_empty = std_msgs.msg.String()
                 send_empty.data = str(self.IS_EMPTY)
                 self.text_pub.publish(send_empty)
@@ -216,26 +143,23 @@ class CharDetector():
                 rospy.logerr("Error processing ROI: %s", str(e))
 
     def calculate_brightness(self, gray):
-        # Create a mask for non-zero values
         mask = gray > 0
-        # Apply the mask to get the unmasked brightness values
         unmasked_brightness = gray[mask]
 
-        # Check if the unmasked_brightness array is empty
+
         if unmasked_brightness.size == 0:
-            print("Warning: unmasked_brightness array is empty.")
-            brightness = 255  # Default brightness value if array is empty
+            rospy.logwarn("Warning: unmasked_brightness array is empty.")
+            brightness = 255  
         else:
             brightness = unmasked_brightness.mean()
-            # Check if the mean value is NaN
+
             if np.isnan(brightness):
-                print("Warning: Calculated mean is NaN.")
-                brightness = 255  # Default brightness value if mean is NaN
+                rospy.logwarn("Warning: Calculated mean is NaN.")
+                brightness = 255  
 
         return int(brightness)
 
     def bilateral_filter(self, image):
-        # Apply bilateral filter
         # d: Diameter of each pixel neighborhood
         # sigmaColor: Filter sigma in the color space
         # sigmaSpace: Filter sigma in the coordinate space
@@ -247,8 +171,6 @@ class CharDetector():
 
 
     def check_results(self, results):
-        check_valid = 0
-        res = results["sector1"]
 
 
         empty_count = 0
@@ -296,43 +218,40 @@ class CharDetector():
         plt.title("Template Matching - Failure Analysis")
         plt.show()
     def perform_tempplate_matching(self, image):
-        template_dir = "/home/apo/catkin_ws/src/ur_master_thesis/src/dataset2/char_templates/"
-        # chars_bckgr
+        template_dir = "/char_templates/"
+
         template_list = sorted(os.listdir(template_dir))
 
-        # Get the dimensions of the image
+     
         height, width = image.shape
 
-        # Define the sectors
+
         sector1 = (0, height // 3)
         sector2 = (height // 3, 2 * height // 3)
         sector3 = (2 * height // 3, height)
 
 
-        # Initialize results dictionary
         results = {'sector1': [], 'sector2': [], 'sector3': []}
         all_detections = []
-        # Iterate through the templates
+
         for template_name in template_list:
-            # Load and resize the template
+    
             template = cv2.imread(os.path.join(template_dir, template_name), 0)
             template = cv2.resize(template, (45, 45))
 
             w, h = template.shape[::-1]
 
-            # Copy and prepare the image for template matching
             img = image.copy()
             method = cv2.TM_CCORR_NORMED
 
-            # Apply template matching
+
             res = cv2.matchTemplate(img, template, method)
             min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
             if max_val > 0.95:
-                # Get the top-left and bottom-right coordinates of the detection
+        
                 top_left = max_loc
                 bottom_right = (top_left[0] + w, top_left[1] + h)
 
-                # Determine the sector and append the template name without ".png"
                 template_name_no_ext = template_name.replace('.png', '')
 
                 # Check for Sector 1: A, B, C, D
@@ -352,28 +271,25 @@ class CharDetector():
 
                 all_detections.append((template, top_left, bottom_right))
 
-        # Print results
-        print("Items detected in Sector 1:", results['sector1'])
-        print("Items detected in Sector 2:", results['sector2'])
-        print("Items detected in Sector 3:", results['sector3'])
-        # print(results)
-        # print("#################")
+
+        rospy.logdebug("Items detected in Sector 1:", results['sector1'])
+        rospy.logdebug("Items detected in Sector 2:", results['sector2'])
+        rospy.logdebug("Items detected in Sector 3:", results['sector3'])
+
         is_valid = self.check_results(results)
-        # print(is_valid)
-        # self.visualize_detections(image, all_detections)
+
         if is_valid == 1:
             return True
         else:
             return False
     
     def perform_image_preprocessing(self, image):
-        # image = cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE)
+
         kernel = np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]]) 
-        
-        # Sharpen the image 
+
         sharpened_image = cv2.filter2D(image, -1, kernel) 
         img_brightness = self.calculate_brightness(sharpened_image)
-        print("BRIGHTNESS: ", img_brightness)
+
         if img_brightness < 100:
             sharpened_image = cv2.equalizeHist(sharpened_image)
 
@@ -393,16 +309,15 @@ class CharDetector():
     def unsharp_masking(self, image, sigma=1.2, strength=2.0):
         # Apply Gaussian blur to the image
         blurred = cv2.GaussianBlur(image, (0, 0), sigma)    # if 0 then computed from sigma 
-
         # Subtract the blurred image from the original image
         sharpened = cv2.addWeighted(image, 1.0 + strength, blurred, -strength, 0)
 
         return sharpened  
     
     def point_callback(self, msg):
-        print("POIN CALLBACK")
+     
         try:
-            print("GOT PLATE CENTER")
+  
             self.roi = msg
             self.plate_center_available = True
      
@@ -413,10 +328,10 @@ class CharDetector():
 
         
 
-    # Define the callback function for the image subscriber
+
     def image_callback(self, msg):
         try:
-            # Convert ROS Image message to OpenCV image
+
             cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
             self.rgb_img = np.array(cv_image)
 
@@ -426,13 +341,13 @@ class CharDetector():
 
 if __name__ == '__main__':
     rospy.loginfo("Start Detect Character Node")
-    # Initialize the ROS node
+
     rospy.init_node('text_detection_node')
     detect_char = CharDetector()
     
         
     try:
-        rate = rospy.Rate(10)  # 10 Hz
+        rate = rospy.Rate(10)  
         while not rospy.is_shutdown():
             detect_char.get_roi()
             rate.sleep()

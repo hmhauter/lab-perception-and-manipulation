@@ -1,3 +1,7 @@
+"""
+Low-pass filter for the force sensor in the UR flange
+"""
+
 class LowPassFilter:
     def __init__(self, alpha):
         self.alpha = alpha
