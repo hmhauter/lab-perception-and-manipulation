@@ -78,3 +78,7 @@ roslaunch ur_calibration calibration_correction.launch \
 ```
 ## Results
 
+The video summarizes the process of pick-and-placing the plate while determining the correct rotation with a stationary, external light source:
+
+https://github.com/user-attachments/assets/716d31c7-090e-4c12-b9dc-916908a00df8
+
